@@ -12,6 +12,7 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <application
         android:allowBackup="true"
@@ -30,7 +31,8 @@
         <activity
             android:name=".RedirectActivity"
             android:label="@string/title_activity_redirect"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".RecordAudioActivity"></activity>
     </application>
 
 </manifest>

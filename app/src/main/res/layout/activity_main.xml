@@ -1,47 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mjniuz.dipo.dipoblinddescriptor.MainActivity">
+    tools:context="com.mjniuz.dipo.dipoblinddescriptor.MainActivity"
+    android:baselineAligned="true">
 
     <SurfaceView
         android:id="@+id/surfaceView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:layout_editor_absoluteX="-25dp"
+        android:layout_width="228dp"
+        android:layout_height="120dp"
         app:layout_constraintBottom_toTopOf="@+id/buttonAlert"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <ImageView
-        android:id="@+id/camera_image"
-        android:layout_width="130dp"
-        android:layout_height="166dp"
-        tools:layout_editor_absoluteY="16dp"
-        tools:layout_editor_absoluteX="187dp" />
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="0dp" />
 
     <Button
-        android:id="@+id/buttonAlert"
+        android:id="@+id/audioBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="API"
+        android:text="Audio"
+        app:layout_constraintHorizontal_bias="0.340"
         tools:layout_editor_absoluteY="313dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintHorizontal_bias="0.652" />
-    <Button
-        android:id="@+id/descriptorBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Descriptor"
-        app:layout_constraintRight_toLeftOf="@+id/buttonAlert"
-        app:layout_constraintLeft_toRightOf="@+id/surfaceView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonAlert"
-        tools:layout_editor_absoluteY="313dp"
-        app:layout_constraintHorizontal_bias="0.452" />
+        android:layout_alignBaseline="@+id/descriptorBtn"
+        android:layout_alignBottom="@+id/descriptorBtn"
+        android:layout_toRightOf="@+id/surfaceView"
+        android:layout_toEndOf="@+id/surfaceView" />
 
     <Button
         android:id="@+id/facBtn"
@@ -49,8 +34,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Face"
-        tools:layout_editor_absoluteX="457dp"
-        tools:layout_editor_absoluteY="224dp" />
+        tools:layout_editor_absoluteY="313dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="0.500"
+        android:layout_alignBaseline="@+id/buttonText"
+        android:layout_alignBottom="@+id/buttonText"
+        android:layout_toRightOf="@+id/buttonText"
+        android:layout_toEndOf="@+id/buttonText" />
+
     <Button
         android:id="@+id/buttonText"
         android:layout_width="wrap_content"
@@ -59,14 +51,51 @@
         tools:layout_editor_absoluteY="313dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintHorizontal_bias="0.852" />
+        app:layout_constraintHorizontal_bias="0.680"
+        android:layout_alignBaseline="@+id/descriptorBtn"
+        android:layout_alignBottom="@+id/descriptorBtn"
+        android:layout_toRightOf="@+id/descriptorBtn"
+        android:layout_toEndOf="@+id/descriptorBtn" />
+
+    <Button
+        android:id="@+id/descriptorBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Descriptor"
+        app:layout_constraintHorizontal_bias="0.780"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_editor_absoluteY="313dp"
+        android:layout_marginTop="87dp"
+        android:layout_marginLeft="19dp"
+        android:layout_marginStart="19dp"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/audioBtn"
+        android:layout_toEndOf="@+id/audioBtn" />
+
+    <Button
+        android:id="@+id/buttonAlert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="API"
+        app:layout_constraintHorizontal_bias="0.751"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="19dp"
+        android:layout_below="@+id/audioBtn"
+        android:layout_toRightOf="@+id/buttonTest"
+        android:layout_toEndOf="@+id/buttonTest" />
+
     <Button
         android:id="@+id/buttonTest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Test"
-        tools:layout_editor_absoluteY="113dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintHorizontal_bias="0.952" />
-</android.support.constraint.ConstraintLayout>
+        app:layout_constraintHorizontal_bias="0.968"
+        android:layout_alignBaseline="@+id/buttonAlert"
+        android:layout_alignBottom="@+id/buttonAlert"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+</RelativeLayout>

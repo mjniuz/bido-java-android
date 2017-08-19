@@ -18,6 +18,12 @@ public class RedirectActivity extends AppCompatActivity {
         super.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_redirect);
 
+
+        Bundle b = getIntent().getExtras();
+        int value = 1000; // or other values
+        if(b != null)
+            value = b.getInt("wait");
+
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
@@ -30,7 +36,7 @@ public class RedirectActivity extends AppCompatActivity {
                         finish();
                     }
                 },
-                3000);
+                value);
     }
 
 }

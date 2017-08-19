@@ -3,7 +3,10 @@ package com.mjniuz.dipo.dipoblinddescriptor;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.AssetFileDescriptor;
 import android.hardware.Camera;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -29,6 +32,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener, SurfaceHolder.Callback {
     final Context context = this;
@@ -44,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     int TAKE_PHOTO_CODE = 0;
     public static int count = 0;
     SurfaceView preview;
+    MediaRecorder recorder = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,9 +64,15 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     Locale locale = new Locale("id", "ID");
                     tts.setLanguage(locale);
 
+
+                    Bundle b = getIntent().getExtras();
+                    int value = -1; // or other values
+                    if(b != null)
+                        value = b.getInt("redirected");
+
                     if(!isNetworkAvailable()){
                         refresh();
-                    }else{
+                    }else if(value == -1){
                         String msg  = "Alat sudah siap";
                         Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
                         toast.show();
@@ -128,6 +139,43 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         });
 
+        final Button audioBtn = (Button) findViewById(R.id.audioBtn);
+        audioBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                // play soound
+                playNotify("beep.wav");
+
+                final String outputFile   = getFilename();
+
+
+                new android.os.Handler().postDelayed(
+                        new Runnable() {
+                            public void run() {
+                                try {
+                                    startRecording(outputFile);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        },
+                        100);
+                Log.d("LONGCLICK", outputFile);
+                return true;
+            }
+
+        });
+
+        audioBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if(!isNetworkAvailable()){
+                    refresh();
+                }
+
+                Log.d("FASTCLICK", "YA");
+            }
+        });
+
         Button testBtn = (Button) findViewById(R.id.buttonTest);
         testBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -139,16 +187,108 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         });
     }
 
+    public String startRecording(final String outputFile) throws IOException{
+        recorder            = new MediaRecorder();
+        int output_formats  = MediaRecorder.OutputFormat.AAC_ADTS;
+
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setOutputFormat(output_formats);
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        recorder.setOutputFile(outputFile);
+        recorder.setAudioSamplingRate(44100);  // 44.1 khz
+        recorder.setOnErrorListener(errorListener);
+        recorder.setOnInfoListener(infoListener);
+        recorder.setMaxDuration(3000);
+
+        try {
+            recorder.prepare();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+
+        recorder.start();
+
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        try {
+                            stop(outputFile);
+
+                            // play soound
+                            playNotify("beep-ok.wav");
+                            callApi("reply", outputFile);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                3000);
+        return null;
+    }
+
+    public void playNotify(String soundName){
+        AssetFileDescriptor afd = null;
+        try {
+            afd = getAssets().openFd(soundName);
+            MediaPlayer player = new MediaPlayer();
+            player.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
+            player.prepare();
+            player.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void stop(String outputFile) throws IOException {
+        recorder.stop();
+        recorder.reset();
+        recorder.release();
+
+        Log.d("RECORDSTOP", outputFile);
+    }
+
+    private MediaRecorder.OnErrorListener errorListener = new MediaRecorder.OnErrorListener() {
+        @Override
+        public void onError(MediaRecorder mr, int what, int extra) {
+            AppLog.logString("Error: " + what + ", " + extra);
+        }
+    };
+
+    private MediaRecorder.OnInfoListener infoListener = new MediaRecorder.OnInfoListener() {
+        @Override
+        public void onInfo(MediaRecorder mr, int what, int extra) {
+            AppLog.logString("Warning: " + what + ", " + extra);
+        }
+    };
+
+    public String getFilename(){
+        String AUDIO_RECORDER_FOLDER = "/DCIM/DIPO";
+        String file_exts[] = { ".aac", ".aac" };
+        int currentFormat = 0;
+        String AUDIO_NAME  = "audio-temp";
+        String filepath = Environment.getExternalStorageDirectory().getPath();
+        File file = new File(filepath,AUDIO_RECORDER_FOLDER);
+
+        if(!file.exists()){
+            file.mkdirs();
+        }
+
+        return (file.getAbsolutePath() + "/" + AUDIO_NAME + file_exts[currentFormat]);
+    }
+
     public void refresh(){
         String msg  = "Koneksi Internet bermasalah, Harap periksa koneksi atau silahkan tunggu beberapa saat untuk inisialisasi";
         Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
         toast.show();
         speak(msg);
 
-        finish();
-
         Intent redirect = new Intent(MainActivity.this, RedirectActivity.class);
+        Bundle b = new Bundle();
+        b.putInt("wait", 4000); //Your id
+        redirect.putExtras(b); //Put your id to your next Intent
         startActivity(redirect);
+        finish();
     }
 
     Camera.ShutterCallback shutterCallback = new Camera.ShutterCallback() {
@@ -217,6 +357,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             case "test-post":
                 apiType = "test-post";
                 break;
+            case "test-post-audio":
+                apiType = "test-post-audio";
+                break;
             default:
                 apiType = "descriptor";
         }
@@ -230,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         arrayw[1]    = filePaths;
         try {
             response = new HttpRequest().execute(arrayw).get();
-            if(apiType != "test-post"){
+            if(apiType != "test-post" && apiType != "test-post-audio"){
                 String msg  = getMessage(response);
                 Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
                 toast.show();
@@ -274,6 +417,16 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             mCamera.release();
 
             mCamera = null;
+        }
+    }
+
+    private void startPreviewAndFreeCamera() {
+        if (mCamera == null) {
+            camera_image = (ImageView) findViewById(R.id.camera_image);//NEEDED FOR THE PREVIEW
+            mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+            mSurfaceView.getHolder().addCallback(this);
+            mSurfaceView.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+            mCamera = Camera.open();
         }
     }
 

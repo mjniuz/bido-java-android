@@ -44,7 +44,7 @@ public class CameraPreview extends AsyncTask<Void, Void, String> {
             Log.d("DIRECTORY", String.valueOf(secStore));
             dir.mkdirs();
 
-            String fileName = String.format("%d.jpg", System.currentTimeMillis());
+            String fileName ="image-temp.jpg";
             File outFile = new File(dir, fileName);
 
             outStream = new FileOutputStream(outFile);
