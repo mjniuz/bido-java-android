@@ -172,6 +172,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     refresh();
                 }
 
+                callApi("reply", "");
+                playNotify("beep-ok.wav");
                 Log.d("FASTCLICK", "YA");
             }
         });
