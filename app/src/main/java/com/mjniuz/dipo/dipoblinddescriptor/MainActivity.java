@@ -1,5 +1,6 @@
 package com.mjniuz.dipo.dipoblinddescriptor;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -15,10 +16,12 @@ import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -49,12 +52,20 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     public static int count = 0;
     SurfaceView preview;
     MediaRecorder recorder = null;
+    boolean flag = false;
+    boolean flag2 = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter.isEnabled() == false) {
+            mBluetoothAdapter.enable();
+        }
 
         // init speaking
         tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -187,6 +198,101 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 mCamera.takePicture(shutterCallback,rawCallback,testCallback);
             }
         });
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        //Log.i("key pressed", String.valueOf(event.getKeyCode()));
+        return super.dispatchKeyEvent(event);
+    }
+
+
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        if (keyCode == 99) {
+            // record audio
+            Log.d("Test", "Long press!");
+            playNotify("beep.wav");
+            final String outputFile   = getFilename();
+
+            new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            try {
+                                startRecording(outputFile);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    },
+                    100);
+            flag = false;
+            flag2 = true;
+
+            return true;
+        }
+
+        return super.onKeyLongPress(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(!isNetworkAvailable()){
+            refresh();
+            return true;
+        }
+
+        if(keyCode == 97){
+            // descriptor
+            mCamera.takePicture(shutterCallback,rawCallback,descCallback);
+            return true;
+        }
+
+        if(keyCode == 100){
+            // face detection
+            mCamera.takePicture(shutterCallback,rawCallback,faceCallback);
+            return true;
+        }
+
+        if(keyCode == 96){
+            // text
+            mCamera.takePicture(shutterCallback,rawCallback,textCallback);
+            return true;
+        }
+
+        if(keyCode == 99){
+            // reply
+            // just reply without audio record
+            event.startTracking();
+            if (flag2 == true) {
+                flag = false;
+            } else {
+                flag = true;
+                flag2 = false;
+            }
+
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == 99) {
+            event.startTracking();
+            if (flag) {
+                Log.d("Test", "Short");
+                // reply
+                callApi("reply", "");
+                playNotify("beep-ok.wav");
+            }
+            flag = true;
+            flag2 = false;
+            return true;
+        }
+
+        return super.onKeyUp(keyCode, event);
     }
 
     public String startRecording(final String outputFile) throws IOException{
