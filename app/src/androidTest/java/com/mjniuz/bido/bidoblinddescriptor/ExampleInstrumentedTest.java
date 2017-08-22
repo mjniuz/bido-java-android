@@ -1,4 +1,4 @@
-package com.mjniuz.dipo.dipoblinddescriptor;
+package com.mjniuz.bido.bidoblinddescriptor;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

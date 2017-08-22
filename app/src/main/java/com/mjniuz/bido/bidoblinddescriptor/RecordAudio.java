@@ -1,15 +1,8 @@
-package com.mjniuz.dipo.dipoblinddescriptor;
+package com.mjniuz.bido.bidoblinddescriptor;
 
 import android.media.MediaRecorder;
-import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Button;
 
-import java.io.File;
 import java.io.IOException;
 
 public class RecordAudio{

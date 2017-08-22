@@ -1,26 +1,15 @@
-package com.mjniuz.dipo.dipoblinddescriptor;
+package com.mjniuz.bido.bidoblinddescriptor;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Camera;
-import android.graphics.Canvas;
-import android.graphics.Path;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
-import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * Created by Alan El on 8/16/2017.

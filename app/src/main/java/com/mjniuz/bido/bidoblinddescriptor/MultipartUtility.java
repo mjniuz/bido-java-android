@@ -1,6 +1,4 @@
-package com.mjniuz.dipo.dipoblinddescriptor;
-
-import android.util.Log;
+package com.mjniuz.bido.bidoblinddescriptor;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,8 +11,6 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Alan El on 8/17/2017.

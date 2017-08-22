@@ -1,14 +1,9 @@
-package com.mjniuz.dipo.dipoblinddescriptor;
+package com.mjniuz.bido.bidoblinddescriptor;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 public class RedirectActivity extends AppCompatActivity {
 

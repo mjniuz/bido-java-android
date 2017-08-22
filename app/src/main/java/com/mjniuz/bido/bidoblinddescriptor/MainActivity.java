@@ -1,4 +1,4 @@
-package com.mjniuz.dipo.dipoblinddescriptor;
+package com.mjniuz.bido.bidoblinddescriptor;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -35,7 +35,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener, SurfaceHolder.Callback {
     final Context context = this;

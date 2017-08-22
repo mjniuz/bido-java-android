@@ -4,6 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mjniuz.dipo.dipoblinddescriptor.RedirectActivity">
+    tools:context="com.mjniuz.bido.bidoblinddescriptor.RedirectActivity">
 
 </android.support.constraint.ConstraintLayout>
