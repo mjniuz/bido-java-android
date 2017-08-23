@@ -12,12 +12,14 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -53,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     MediaRecorder recorder = null;
     boolean flag = false;
     boolean flag2 = false;
+    boolean flagDesc = false;
+    boolean flagDesc2 = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,31 +70,40 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             mBluetoothAdapter.enable();
         }
 
-        // init speaking
-        tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if(status != TextToSpeech.ERROR) {
-                    Locale locale = new Locale("id", "ID");
-                    tts.setLanguage(locale);
+        try {
+            adjustBright();
+        } catch (Settings.SettingNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
+        if(!isNetworkAvailable()){
+            refresh();
+        }else{
+            playNotify("success.wav");
+            // init speaking
+            tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+                    if(status == TextToSpeech.SUCCESS) {
+                        Locale locale = new Locale("id", "ID");
+                        tts.setLanguage(locale);
 
-                    Bundle b = getIntent().getExtras();
-                    int value = -1; // or other values
-                    if(b != null)
-                        value = b.getInt("redirected");
+                        Bundle b = getIntent().getExtras();
+                        int value = -1; // or other values
+                        if(b != null)
+                            value = b.getInt("redirected");
 
-                    if(!isNetworkAvailable()){
-                        refresh();
-                    }else if(value == -1){
                         String msg  = "Alat sudah siap";
                         Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
                         toast.show();
                         speak(msg);
+                    }else{
+                        refresh();
                     }
                 }
-            }
-        });
+            });
+        }
 
         Button replyBtn = (Button) findViewById(R.id.buttonAlert);
         replyBtn.setOnTouchListener(new View.OnTouchListener()
@@ -231,7 +244,20 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             return true;
         }
 
+        if (keyCode == 97) {
+            flagDesc = false;
+            flagDesc2 = true;
+
+            refresh();
+        }
+
         return super.onKeyLongPress(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.d("PRESS", "BACKPRESS");
+        return;
     }
 
     @Override
@@ -243,7 +269,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         if(keyCode == 97){
             // descriptor
-            mCamera.takePicture(shutterCallback,rawCallback,descCallback);
+            event.startTracking();
+            if (flagDesc2 == true) {
+                flagDesc = false;
+            } else {
+                flagDesc = true;
+                flagDesc2 = false;
+            }
+
             return true;
         }
 
@@ -257,6 +290,12 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             // text
             mCamera.takePicture(shutterCallback,rawCallback,textCallback);
             return true;
+        }
+
+        // disable all button except volume
+        if(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == event.KEYCODE_VOLUME_UP){
+            Log.d("PRESS", "Volume");
+            return super.onKeyDown(keyCode, event);
         }
 
         if(keyCode == 99){
@@ -273,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             return true;
         }
 
-        return super.onKeyDown(keyCode, event);
+        return false; //super.onKeyDown(keyCode, event);
     }
 
     @Override
@@ -288,6 +327,16 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
             flag = true;
             flag2 = false;
+            return true;
+        }
+
+        if (keyCode == 97) {
+            event.startTracking();
+            if (flagDesc) {
+                mCamera.takePicture(shutterCallback,rawCallback,descCallback);
+            }
+            flagDesc = true;
+            flagDesc2 = false;
             return true;
         }
 
@@ -344,7 +393,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public void stop(String outputFile) throws IOException {
@@ -388,13 +436,17 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         String msg  = "Koneksi Internet bermasalah, Harap periksa koneksi atau silahkan tunggu beberapa saat untuk inisialisasi";
         Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
         toast.show();
-        speak(msg);
+
+        //playNotify("beep-error.wav");
 
         Intent redirect = new Intent(MainActivity.this, RedirectActivity.class);
         Bundle b = new Bundle();
-        b.putInt("wait", 4000); //Your id
+        b.putInt("wait", 10000); //Your id
         redirect.putExtras(b); //Put your id to your next Intent
         startActivity(redirect);
+
+        MainActivity.this.startActivity(redirect);
+
         finish();
     }
 
@@ -545,6 +597,10 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     }
 
     public String getMessage(String str){
+        if(!isNetworkAvailable()){
+            return "";
+        }
+
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(str);
@@ -564,7 +620,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @Override
     public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
+        if (status == TextToSpeech.ERROR) {
+            refresh();
         }
     }
 
@@ -587,24 +644,30 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     protected void onResume() {
         super.onResume();
 
-        try {
+        //stopPreviewAndFreeCamera();
+        /*try {
             mCamera.reconnect();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        mCamera.stopPreview();
+        if (mCamera != null) {
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mCamera.release();
+
+        stopPreviewAndFreeCamera();
     }
 
     @Override
@@ -628,14 +691,55 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         if(b != null)
             value = b.getInt("redirected");
 
-        Camera.Parameters params = mCamera.getParameters();
-        List<Camera.Size> sizes = params.getSupportedPreviewSizes();
-        Camera.Size selected = sizes.get(0);
-        params.setPreviewSize(selected.width,selected.height);
-        mCamera.setParameters(params);
+        try {
+            Camera.CameraInfo info = new Camera.CameraInfo();
+            Camera.Parameters params = mCamera.getParameters();
+            List<Camera.Size> sizes = params.getSupportedPreviewSizes();
+            Camera.Size selected = sizes.get(0);
+            params.setPreviewSize(selected.width,selected.height);
+            mCamera.setParameters(params);
 
-        setDisplayOrientation(mCamera, value);
-        mCamera.startPreview();
+            int rotate = getCorrectCameraOrientation(info,mCamera);
+            Log.d("rotate", String.valueOf(rotate));
+            setDisplayOrientation(mCamera, rotate);
+            mCamera.startPreview();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getCorrectCameraOrientation(Camera.CameraInfo info, Camera camera) {
+        int rotation = this.getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+
+        switch(rotation){
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
+
+        }
+
+        int result;
+        if(info.facing==Camera.CameraInfo.CAMERA_FACING_FRONT){
+            result = (info.orientation + degrees + 90) % 360;
+            result = (360 - result) % 360;
+        }else{
+            result = (info.orientation - degrees + 360 + 90) % 360;
+        }
+
+        return result;
     }
 
     protected void setDisplayOrientation(Camera camera, int angle){
@@ -654,5 +758,21 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
 
+    }
+
+
+    private void adjustBright() throws Settings.SettingNotFoundException {
+        // TODO Auto-generated method stub
+        int brightnessMode = Settings.System.getInt(getContentResolver(),
+                Settings.System.SCREEN_BRIGHTNESS_MODE);
+        if (brightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+            Settings.System.putInt(getContentResolver(),
+                    Settings.System.SCREEN_BRIGHTNESS_MODE,
+                    Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+        }
+
+        WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
+        layoutParams.screenBrightness = 0F;
+        getWindow().setAttributes(layoutParams);
     }
 }
