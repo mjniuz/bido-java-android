@@ -26,7 +26,7 @@
         android:autoLink="web"
         android:text="Bido, Blind Descriptor.
 
-        Information/tutorial, click https://github.com/mjniuz/dipo-java-android
+        Information/tutorial, click https://github.com/mjniuz/bido-java-android
 
         Apps and Concept by Muhamad Yulianto mail@mjniuz.com" />
 </RelativeLayout>
