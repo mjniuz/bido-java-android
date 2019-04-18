@@ -3,7 +3,6 @@ package com.mjniuz.bido.bidoblinddescriptor;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.AssetFileDescriptor;
 import android.hardware.Camera;
 import android.media.MediaPlayer;
@@ -17,16 +16,21 @@ import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
+import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
+import android.view.ViewGroup.LayoutParams;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,16 +62,77 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     boolean flagDesc = false;
     boolean flagDesc2 = false;
 
+
+    private PopupWindow mPopupWindow;
+    private RelativeLayout mRelativeLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        super.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //super.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
+
+        // popup
+        mRelativeLayout = (RelativeLayout) findViewById(R.id.activity_main);
+        Button popupInfo = (Button) findViewById(R.id.popupInfo);
+        popupInfo.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+
+                // Initialize a new instance of LayoutInflater service
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+
+                // Inflate the custom layout/view
+                View customView = inflater.inflate(R.layout.custom_layout,null);
+
+                /*
+                    public PopupWindow (View contentView, int width, int height)
+                        Create a new non focusable popup window which can display the contentView.
+                        The dimension of the window must be passed to this constructor.
+
+                        The popup does not provide any background. This should be handled by
+                        the content view.
+
+                    Parameters
+                        contentView : the popup's content
+                        width : the popup's width
+                        height : the popup's height
+                */
+                // Initialize a new instance of popup window
+                mPopupWindow = new PopupWindow(
+                        customView,
+                        LayoutParams.WRAP_CONTENT,
+                        LayoutParams.WRAP_CONTENT
+                );
+
+                // Set an elevation value for popup window
+                // Call requires API level 21
+                if(Build.VERSION.SDK_INT>=21){
+                    mPopupWindow.setElevation(5.0f);
+                }
+
+                // Get a reference for the custom view close button
+                ImageButton closeButton = (ImageButton) customView.findViewById(R.id.ib_close);
+
+                // Set a click listener for the popup window close button
+                closeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // Dismiss the popup window
+                        mPopupWindow.dismiss();
+                    }
+                });
+                mPopupWindow.showAtLocation(mRelativeLayout, Gravity.CENTER,0,0);
+            }
+        });
+
+
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter.isEnabled() == false) {
-            mBluetoothAdapter.enable();
+        if(mBluetoothAdapter != null){
+            if (mBluetoothAdapter.isEnabled() == false) {
+                mBluetoothAdapter.enable();
+            }
         }
 
         try {
@@ -105,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             });
         }
 
-        Button replyBtn = (Button) findViewById(R.id.buttonAlert);
+        /*Button replyBtn = (Button) findViewById(R.id.buttonAlert);
         replyBtn.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
@@ -123,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 return false;
             }
 
-        });
+        });*/
 
 
         camera_image = (ImageView) findViewById(R.id.camera_image);//NEEDED FOR THE PREVIEW
@@ -201,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         });
 
-        Button testBtn = (Button) findViewById(R.id.buttonTest);
+        /*Button testBtn = (Button) findViewById(R.id.buttonTest);
         testBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if(!isNetworkAvailable()){
@@ -209,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 }
                 mCamera.takePicture(shutterCallback,rawCallback,testCallback);
             }
-        });
+        });*/
     }
 
     @Override
@@ -674,8 +739,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         try {
             Camera.Parameters params = mCamera.getParameters();
-            params.setPictureSize(1920, 1080);
-            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+
+            //params.setPictureSize(1080, 720);
+            //params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
             mCamera.setParameters(params);
 
             mCamera.setPreviewDisplay(mSurfaceView.getHolder());
@@ -701,7 +767,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
             int rotate = getCorrectCameraOrientation(info,mCamera);
             Log.d("rotate", String.valueOf(rotate));
-            setDisplayOrientation(mCamera, rotate);
+            //setDisplayOrientation(mCamera, rotate);
             mCamera.startPreview();
         } catch (Exception e) {
             e.printStackTrace();
