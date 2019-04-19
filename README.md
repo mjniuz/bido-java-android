@@ -39,7 +39,7 @@ You can select *Indonesia* and click Install
     Bido can also save the faces/person and you can customize the name of the person by pressing *VOICE*, and saying the name for the latest face object analyzed.
 
 #### Voice
-* This feature only available after capturing FACE, if person's face is not saved before, you can press this button and wait until beep sound, then start saying the name of those person's face in less than 3 second, then the system will save the name and when you capture face for the same person, it will tell you the name.
+* This feature only available after capturing FACE, if person's face is not saved before, you can press this button and wait until beep sound, then start saying the name of those person's face in less than 3 second, then the system will save the name and when you capture face for the same person, BIDO can tell you the name.
 
 Video Demo
 
