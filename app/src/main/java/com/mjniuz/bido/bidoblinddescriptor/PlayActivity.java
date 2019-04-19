@@ -194,8 +194,11 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
         audioBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                // play soound
+                progressDialog.setTitle("Start Saying...");
+                progressDialog.setMessage("Start saying the name of the face that you want to save. And please wait...");
                 progressDialog.show();
+
+                // play soound
                 playNotify("beep.wav");
 
                 final String outputFile   = getFilename();
@@ -220,6 +223,9 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         audioBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                progressDialog.setTitle("Start Saying...");
+                progressDialog.setMessage("Start saying the name of the face that you want to save. And please wait...");
+
                 progressDialog.show();
                 /*if(!isNetworkAvailable()){
                     refresh();
