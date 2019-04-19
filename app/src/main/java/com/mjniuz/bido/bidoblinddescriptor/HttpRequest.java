@@ -1,5 +1,7 @@
 package com.mjniuz.bido.bidoblinddescriptor;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -20,12 +22,15 @@ import java.net.URLConnection;
  */
 
 public class HttpRequest extends AsyncTask<String, Void, String> {
+    final HttpRequest context = this;
     public String result = "none";
     public File file;
     private static final String LINE_FEED = "\r\n";
 
     protected void onPreExecute() {
+        super.onPreExecute();
     }
+
 
     protected String doInBackground(String... passing) {
         // for post file only

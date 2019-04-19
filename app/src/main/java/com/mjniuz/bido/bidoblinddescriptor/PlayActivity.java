@@ -1,10 +1,10 @@
 package com.mjniuz.bido.bidoblinddescriptor;
 
-import android.Manifest;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.pm.ActivityInfo;
 import android.content.res.AssetFileDescriptor;
 import android.hardware.Camera;
 import android.media.MediaPlayer;
@@ -17,21 +17,15 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -66,6 +60,8 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
     boolean flag2 = false;
     boolean flagDesc = false;
     boolean flagDesc2 = false;
+    private static ProgressDialog progressDialog;
+
 
 
     private PopupWindow mPopupWindow;
@@ -74,7 +70,7 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //super.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        super.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -146,12 +142,27 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
         mSurfaceView.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         mCamera = Camera.open();
 
+        Camera.CameraInfo info = new Camera.CameraInfo();
+        int rotate = getCorrectCameraOrientation(info,mCamera);
+        //mCamera.setDisplayOrientation(rotate);
+
+
+
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setTitle("Please wait, processing");
+        progressDialog.setMessage("Until you hear the voice response, then you can dismiss this dialog");
+        progressDialog.setIndeterminate(false);
+        progressDialog.setCancelable(false);
+        Log.d("PROGRESS_DIALOG", "starting");
+
         Button descriptorBtn = (Button) findViewById(R.id.descriptorBtn);
         descriptorBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if(!isNetworkAvailable()){
                     refresh();
                 }
+
+                progressDialog.show();
 
                 mCamera.takePicture(shutterCallback,rawCallback,descCallback);
             }
@@ -163,6 +174,7 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 if(!isNetworkAvailable()){
                     refresh();
                 }
+                progressDialog.show();
                 mCamera.takePicture(shutterCallback,rawCallback,faceCallback);
             }
         });
@@ -173,6 +185,7 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 if(!isNetworkAvailable()){
                     refresh();
                 }
+                progressDialog.show();
                 mCamera.takePicture(shutterCallback,rawCallback,textCallback);
             }
         });
@@ -182,6 +195,7 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
             @Override
             public boolean onLongClick(View v) {
                 // play soound
+                progressDialog.show();
                 playNotify("beep.wav");
 
                 final String outputFile   = getFilename();
@@ -206,6 +220,7 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         audioBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                progressDialog.show();
                 /*if(!isNetworkAvailable()){
                     refresh();
                 }
@@ -519,12 +534,15 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     Camera.PictureCallback descCallback = new Camera.PictureCallback() {
         public void onPictureTaken(byte[] data, Camera camera) {
+
             captureCam(data, "descriptor");
+
         }
     };
 
     public void captureCam(byte[] data, String type){
         String cameraPath = null;
+
         try {
             cameraPath = new CameraPreview(data).execute().get();
 
@@ -566,7 +584,9 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
         String[] arrayw = new String[2]; //populate array
         arrayw[0]    = apiType;
         arrayw[1]    = filePaths;
+
         try {
+
             response = new HttpRequest().execute(arrayw).get();
             if(apiType != "test-post" && apiType != "test-post-audio"){
                 String msg  = getMessage(response);
@@ -574,9 +594,16 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 toast.show();
 
                 speak(msg);
+
+                if(progressDialog.isShowing()){
+                    progressDialog.dismiss();
+                }
+                Log.d("PROGRESS_DIALOG", "dismissed");
             }else{
                 Toast toast = Toast.makeText(context, response, Toast.LENGTH_LONG);
                 toast.show();
+
+                //progressDialog.dismiss();
             }
 
             Log.d("RESULT", response);
@@ -715,7 +742,15 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
             Log.d("CAM_WIDTH", String.valueOf(widthInt));
             Log.d("CAM_HEIGHT", String.valueOf(heightInt));
 
-            //params.setPictureSize(defWidth, defHeight);
+            int widthDef    = 1080;
+            int heightDef   = 720;
+
+            if(widthInt < widthDef){
+                widthDef    = widthInt;
+                heightDef   = heightInt;
+            }
+
+            params.setPictureSize(widthDef, heightDef);
             //params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
             mCamera.setParameters(params);
 
@@ -745,9 +780,9 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
             params.setPreviewSize(selected.width,selected.height);
             mCamera.setParameters(params);
 
-            //int rotate = getCorrectCameraOrientation(info,mCamera);
-            //Log.d("rotate", String.valueOf(rotate));
-            //setDisplayOrientation(mCamera, rotate);
+            int rotate = getCorrectCameraOrientation(info,mCamera);
+            Log.d("rotate", String.valueOf(rotate));
+            setDisplayOrientation(mCamera, rotate);
             mCamera.startPreview();
         } catch (Exception e) {
             e.printStackTrace();
@@ -785,6 +820,8 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
             result = (info.orientation - degrees + 360 + 90) % 360;
         }
 
+        Log.d("CAM_ROTATE", String.valueOf(result));
+
         return result;
     }
 
@@ -798,6 +835,7 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
         catch (Exception e1)
         {
+            Log.d("CAM_ROTATE", e1.getMessage());
         }
     }
 
