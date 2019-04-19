@@ -16,7 +16,7 @@ public class RecordAudio{
         recorder.setOutputFormat(output_formats);
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         recorder.setOutputFile(outputFile);
-        recorder.setAudioSamplingRate(5);  // 44.1 khz
+        //recorder.setAudioSamplingRate(5);  // 44.1 khz
         recorder.setOnErrorListener(errorListener);
         recorder.setOnInfoListener(infoListener);
 

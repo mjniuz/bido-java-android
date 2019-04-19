@@ -150,7 +150,7 @@ public class PlayActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         progressDialog = new ProgressDialog(context);
         progressDialog.setTitle("Please wait, processing");
-        progressDialog.setMessage("Until you hear the voice response, then you can dismiss this dialog");
+        progressDialog.setMessage("Until you hear the voice response, it may take up to 10sec");
         progressDialog.setIndeterminate(false);
         progressDialog.setCancelable(false);
         Log.d("PROGRESS_DIALOG", "starting");
