@@ -19,7 +19,7 @@ You can select *Indonesia* and click Install
 
 
 ## Installation
-1. Download the APK file here [DOWNLOAD](https://raw.githubusercontent.com/mjniuz/bido-java-android/master/apk/bido-latest-debug.apk) and install the apk
+1. Download the APK file here [DOWNLOAD](http://bit.ly/bido-app) and install the apk
 2. (For some old Android Phone) You need to allow permission manually, before launch the app, Open setting -> Apps & Notification -> Select Bido Blind Descriptor -> Permissions -> Enable all permission (Camera, Microphone and Storage)
 3. You can now open Bido Blind Descriptor App
 
