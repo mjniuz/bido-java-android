@@ -6,8 +6,8 @@ Blind Descriptor Java Android
 ## Instruction
 ### Device Minimum Requirement
     - Android version 6.0 (Marshmallow)
+    - Camera min 1080X720px
 	- Internet Connection > 10mbps
-	- Camera support
 	- 1Gb of RAM
 	- Developer Mode Enabled
 	- Indonesian Language for text to speech voice google
