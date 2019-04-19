@@ -29,7 +29,7 @@ public class RedirectActivity extends AppCompatActivity {
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
-                        Intent redirect = new Intent(RedirectActivity.this, MainActivity.class);
+                        Intent redirect = new Intent(RedirectActivity.this, PlayActivity.class);
 
                         Bundle b = new Bundle();
                         b.putInt("redirected", 0); //Your id

@@ -61,17 +61,24 @@
             android:layout_marginLeft="147dp"
             android:text="Voice Reply" />
 
-        <Button
-            android:id="@+id/popupInfo"
-            android:layout_width="110dp"
-            android:layout_height="50dp"
-            android:layout_below="@+id/audioBtn"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginStart="147dp"
-            android:layout_marginLeft="147dp"
-            android:text="Info" />
 
+        <TextView
+            android:id="@+id/tv"
+            android:layout_below="@+id/audioBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:padding="25sp"
+            android:autoLink="web"
+            android:text="
+Bido, Blind Descriptor.
+
+Information/tutorial, click
+https://github.com/mjniuz/bido-java-android
+
+Apps and Concept by
+Muhamad Yulianto
+mail@mjniuz.com" />
 
     </RelativeLayout>
 </ScrollView>
