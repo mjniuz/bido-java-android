@@ -19,8 +19,9 @@ You can select *Indonesia* and click Install
 
 
 Installation
+
     - Download the APK file, and install the apk
-    - Allow permission, before launch the app, ```Open setting -> Apps & Notification -> Select Bido Blind Descriptor -> Permissions -> Enable all permission (Camera, Microphone and Storage)
+    - (For some old Android Phone) Allow permission, before launch the app, ```Open setting -> Apps & Notification -> Select Bido Blind Descriptor -> Permissions -> Enable all permission (Camera, Microphone and Storage)
     ```
     - You can now open Bido Blind Descriptor App
 
@@ -43,6 +44,7 @@ How To
         This feature only available after capturing FACE, if person's face is not saved before, you can press this button and wait until beep sound, then start saying the name of those person's face in less than 3 second, then the system will save the name and when you capture face for the same person, it will tell you the name.
 
 Video Demo
+
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Q0Ov0xt-09c/0.jpg)](https://www.youtube.com/watch?v=Q0Ov0xt-09c)
 
 Contact mail@mjniuz.com
