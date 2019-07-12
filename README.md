@@ -3,30 +3,6 @@ Blind Descriptor Java Android
 
 > App for converting Captured image to the voice synthesis to help blind person understand with their conditions around
 
-## Instruction
-### Device Minimum Requirement
-    - Android version 6.0 (Marshmallow)
-    - Camera min 1080X720px
-	- Internet Connection > 10mbps
-	- 1Gb of RAM
-	- Developer Mode Enabled
-	- Indonesian Language for text to speech voice google
-
-### How To install (Text To Speech) TTS Language, follow this instruction
-[![N|Solid](https://cdn57.androidauthority.net/wp-content/uploads/2015/12/Google-text-to-speech-engine.png)](https://nodesource.com/products/nsolid)
-[![N|Solid](https://cdn57.androidauthority.net/wp-content/uploads/2015/12/Google-text-to-speech-engine-3.png)](https://nodesource.com/products/nsolid)
-You can select *Indonesia* and click Install
-
-
-## Installation
-1. Download the APK file here [DOWNLOAD](http://bit.ly/bido-app) and install the apk
-2. (For some old Android Phone) You need to allow permission manually, before launch the app, Open setting -> Apps & Notification -> Select Bido Blind Descriptor -> Permissions -> Enable all permission (Camera, Microphone and Storage)
-3. You can now open Bido Blind Descriptor App
-
-
-## How To
-> This App Bido Blind Descriptor Java Android is just an virtual app that allowing a normal person to try app for blind person. In Production mode, it should be placed on a wearable that can be fit in head (like a smart glasses) so blind person can use that device properly.
-
 ### Button and Features Instruction
 #### Descriptor
 * This button will capture image from camera and describe generally whats going on in the picture by voice in Indonesian Language, You can direct the camera to some object to analyze it.
